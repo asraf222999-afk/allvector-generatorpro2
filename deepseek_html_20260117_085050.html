@@ -1,0 +1,66 @@
+<!-- Add Premium Features Modal -->
+<div id="premiumModal" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50 hidden">
+  <div class="bg-gray-900 rounded-2xl p-8 max-w-4xl w-full mx-4">
+    <div class="flex items-center justify-between mb-8">
+      <h2 class="text-2xl font-bold">Upgrade to Premium</h2>
+      <button onclick="closePremiumModal()" class="text-gray-400 hover:text-white">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <!-- Free Plan -->
+      <div class="bg-white/5 p-6 rounded-xl">
+        <h3 class="text-xl font-bold mb-2">Free</h3>
+        <div class="text-3xl font-bold mb-4">$0<span class="text-gray-400 text-sm">/forever</span></div>
+        <ul class="space-y-3 mb-6">
+          <li class="flex items-center"><i class="fas fa-check text-emerald-400 mr-2"></i> 5 Designs/month</li>
+          <li class="flex items-center"><i class="fas fa-check text-emerald-400 mr-2"></i> Basic SVG Files</li>
+          <li class="flex items-center"><i class="fas fa-check text-emerald-400 mr-2"></i> 1024px Resolution</li>
+          <li class="flex items-center"><i class="fas fa-times text-gray-500 mr-2"></i> Commercial License</li>
+          <li class="flex items-center"><i class="fas fa-times text-gray-500 mr-2"></i> Premium Templates</li>
+        </ul>
+        <button class="w-full bg-white/10 hover:bg-white/20 py-3 rounded-lg">
+          Current Plan
+        </button>
+      </div>
+      
+      <!-- Pro Plan -->
+      <div class="bg-gradient-to-br from-indigo-900/50 to-purple-900/50 border border-indigo-700 p-6 rounded-xl relative">
+        <div class="absolute -top-3 left-1/2 transform -translate-x-1/2">
+          <span class="bg-gradient-to-r from-indigo-600 to-purple-600 text-white px-4 py-1 rounded-full text-sm font-bold">
+            POPULAR
+          </span>
+        </div>
+        <h3 class="text-xl font-bold mb-2">Pro</h3>
+        <div class="text-3xl font-bold mb-4">$29<span class="text-gray-400 text-sm">/month</span></div>
+        <ul class="space-y-3 mb-6">
+          <li class="flex items-center"><i class="fas fa-check text-emerald-400 mr-2"></i> Unlimited Designs</li>
+          <li class="flex items-center"><i class="fas fa-check text-emerald-400 mr-2"></i> High-Quality SVG/AI/PDF</li>
+          <li class="flex items-center"><i class="fas fa-check text-emerald-400 mr-2"></i> 4096px Resolution</li>
+          <li class="flex items-center"><i class="fas fa-check text-emerald-400 mr-2"></i> Commercial License</li>
+          <li class="flex items-center"><i class="fas fa-check text-emerald-400 mr-2"></i> 100+ Premium Templates</li>
+        </ul>
+        <button onclick="upgradeToPro()" class="w-full gradient-bg hover:opacity-90 py-3 rounded-lg font-bold">
+          Upgrade to Pro
+        </button>
+      </div>
+      
+      <!-- Team Plan -->
+      <div class="bg-white/5 p-6 rounded-xl">
+        <h3 class="text-xl font-bold mb-2">Team</h3>
+        <div class="text-3xl font-bold mb-4">$99<span class="text-gray-400 text-sm">/month</span></div>
+        <ul class="space-y-3 mb-6">
+          <li class="flex items-center"><i class="fas fa-check text-emerald-400 mr-2"></i> Everything in Pro</li>
+          <li class="flex items-center"><i class="fas fa-check text-emerald-400 mr-2"></i> 5 Team Members</li>
+          <li class="flex items-center"><i class="fas fa-check text-emerald-400 mr-2"></i> Team Collaboration</li>
+          <li class="flex items-center"><i class="fas fa-check text-emerald-400 mr-2"></i> Brand Kit Management</li>
+          <li class="flex items-center"><i class="fas fa-check text-emerald-400 mr-2"></i> Priority Support</li>
+        </ul>
+        <button onclick="upgradeToTeam()" class="w-full bg-white/10 hover:bg-white/20 py-3 rounded-lg">
+          Contact Sales
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,76 @@
+<!-- Add this MODAL for Signup -->
+<div id="signupModal" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50 hidden">
+  <div class="bg-gray-900 rounded-2xl p-8 max-w-md w-full mx-4">
+    <div class="flex items-center justify-between mb-6">
+      <h3 class="text-xl font-bold">Create Free Account</h3>
+      <button onclick="closeSignupModal()" class="text-gray-400 hover:text-white">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <div class="space-y-4">
+      <div>
+        <label class="block text-sm font-medium mb-2">Email Address</label>
+        <input type="email" id="signupEmail" class="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3" placeholder="you@example.com">
+      </div>
+      
+      <div>
+        <label class="block text-sm font-medium mb-2">Password</label>
+        <input type="password" id="signupPassword" class="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3" placeholder="••••••••">
+      </div>
+      
+      <div class="flex items-center">
+        <input type="checkbox" id="terms" class="rounded">
+        <label for="terms" class="ml-2 text-sm text-gray-400">
+          I agree to <a href="#" class="text-indigo-400">Terms</a> and <a href="#" class="text-indigo-400">Privacy Policy</a>
+        </label>
+      </div>
+      
+      <button onclick="signupUser()" class="w-full gradient-bg hover:opacity-90 py-3 rounded-lg font-medium">
+        <i class="fas fa-user-plus mr-2"></i>
+        Create Free Account
+      </button>
+      
+      <div class="text-center text-sm text-gray-400">
+        Already have account? <button onclick="showLogin()" class="text-indigo-400">Login</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- User Dashboard -->
+<div id="userDashboard" class="hidden glass-effect rounded-2xl p-6 mb-6">
+  <div class="flex items-center justify-between mb-4">
+    <div class="flex items-center space-x-3">
+      <div class="w-12 h-12 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center">
+        <span id="userInitial" class="font-bold"></span>
+      </div>
+      <div>
+        <div class="font-bold" id="userEmail"></div>
+        <div class="text-sm text-gray-400">Pro Member</div>
+      </div>
+    </div>
+    <button onclick="logout()" class="text-sm bg-white/10 hover:bg-white/20 px-4 py-2 rounded-lg">
+      <i class="fas fa-sign-out-alt mr-2"></i>Logout
+    </button>
+  </div>
+  
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div class="text-center p-3 bg-white/5 rounded-lg">
+      <div class="text-xl font-bold" id="generatedCount">0</div>
+      <div class="text-gray-400 text-sm">Designs Created</div>
+    </div>
+    <div class="text-center p-3 bg-white/5 rounded-lg">
+      <div class="text-xl font-bold" id="downloadCount">0</div>
+      <div class="text-gray-400 text-sm">Files Downloaded</div>
+    </div>
+    <div class="text-center p-3 bg-white/5 rounded-lg">
+      <div class="text-xl font-bold">Unlimited</div>
+      <div class="text-gray-400 text-sm">Vector Assets</div>
+    </div>
+    <div class="text-center p-3 bg-white/5 rounded-lg">
+      <div class="text-xl font-bold text-emerald-400">100%</div>
+      <div class="text-gray-400 text-sm">Commercial Use</div>
+    </div>
+  </div>
+</div>
