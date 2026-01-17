@@ -1,0 +1,1391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>DesignBrief Pro - Generate Complete Design Files from Brief</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="Upload your design brief and get complete design files including logos, color palettes, typography, UI components, and style guides.">
+  
+  <!-- Tailwind CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  
+  <!-- Custom CSS -->
+  <style>
+    :root {
+      --primary: #6366f1;
+      --secondary: #8b5cf6;
+      --accent: #10b981;
+    }
+    
+    body {
+      background: radial-gradient(circle at top, #0f172a, #020617);
+      min-height: 100vh;
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+    }
+    
+    .gradient-text {
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .gradient-bg {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+    }
+    
+    .glass-effect {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .fade-in {
+      animation: fadeIn 0.5s ease-in;
+    }
+    
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    
+    .slide-up {
+      animation: slideUp 0.5s ease-out;
+    }
+    
+    @keyframes slideUp {
+      from { transform: translateY(20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    
+    /* File type icons */
+    .file-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+      margin-right: 15px;
+    }
+    
+    .ai-thinking {
+      position: relative;
+      width: 80px;
+      height: 80px;
+    }
+    
+    .ai-thinking::before {
+      content: '';
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border: 3px solid transparent;
+      border-top-color: var(--primary);
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    /* Progress bar */
+    .progress-bar {
+      height: 6px;
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 3px;
+      overflow: hidden;
+    }
+    
+    .progress-fill {
+      height: 100%;
+      background: linear-gradient(90deg, var(--primary), var(--secondary));
+      border-radius: 3px;
+      transition: width 0.3s ease;
+    }
+    
+    /* Design file preview */
+    .design-preview {
+      transition: all 0.3s ease;
+      cursor: pointer;
+    }
+    
+    .design-preview:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    }
+    
+    /* Step indicator */
+    .step-indicator {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      background: rgba(255, 255, 255, 0.1);
+    }
+    
+    .step-indicator.active {
+      background: linear-gradient(135deg, var(--primary), var(--secondary));
+    }
+    
+    /* Design system elements */
+    .color-swatch {
+      width: 60px;
+      height: 60px;
+      border-radius: 12px;
+      display: inline-block;
+      margin: 5px;
+      border: 2px solid rgba(255, 255, 255, 0.1);
+      cursor: pointer;
+    }
+    
+    .typography-sample {
+      border-left: 4px solid var(--primary);
+      padding-left: 15px;
+      margin: 10px 0;
+    }
+    
+    /* Upload area */
+    .upload-area {
+      border: 2px dashed rgba(255, 255, 255, 0.2);
+      border-radius: 20px;
+      transition: all 0.3s ease;
+    }
+    
+    .upload-area:hover {
+      border-color: var(--primary);
+      background: rgba(99, 102, 241, 0.05);
+    }
+    
+    .upload-area.dragover {
+      border-color: var(--primary);
+      background: rgba(99, 102, 241, 0.1);
+    }
+  </style>
+</head>
+
+<body class="text-white font-sans">
+
+<!-- Navbar -->
+<header class="flex items-center justify-between px-4 sm:px-8 py-4 border-b border-white/10 sticky top-0 bg-gray-900/80 backdrop-blur-md z-50">
+  <div class="flex items-center space-x-2">
+    <div class="w-8 h-8 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 flex items-center justify-center">
+      <i class="fas fa-pencil-ruler text-sm"></i>
+    </div>
+    <h1 class="text-xl font-bold tracking-wide">Design<span class="gradient-text">Brief</span> Pro</h1>
+  </div>
+  
+  <nav class="hidden md:flex space-x-8 text-sm text-gray-300">
+    <a href="#brief" class="hover:text-white transition-colors"><i class="fas fa-file-alt mr-2"></i>Brief</a>
+    <a href="#files" class="hover:text-white transition-colors"><i class="fas fa-file-export mr-2"></i>Files</a>
+    <a href="#preview" class="hover:text-white transition-colors"><i class="fas fa-eye mr-2"></i>Preview</a>
+    <a href="#download" class="hover:text-white transition-colors"><i class="fas fa-download mr-2"></i>Download</a>
+  </nav>
+  
+  <div class="flex items-center space-x-4">
+    <div class="hidden md:flex items-center space-x-2 bg-white/10 px-3 py-1 rounded-lg">
+      <div class="w-2 h-2 rounded-full bg-green-500 animate-pulse"></div>
+      <span class="text-sm">AI Ready</span>
+    </div>
+    <button class="bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-lg transition-all font-medium">
+      <i class="fas fa-robot mr-2"></i>Generate
+    </button>
+  </div>
+</header>
+
+<main class="px-4 sm:px-6 py-8">
+  <!-- Hero Section -->
+  <section class="text-center max-w-4xl mx-auto py-12 slide-up">
+    <div class="inline-flex items-center px-4 py-2 rounded-full bg-indigo-900/30 text-indigo-300 text-sm font-medium mb-6 border border-indigo-700/30">
+      <i class="fas fa-magic mr-2"></i>
+      <span>AI-POWERED DESIGN GENERATION</span>
+    </div>
+    
+    <h1 class="text-4xl md:text-6xl font-extrabold mb-6 leading-tight">
+      From <span class="gradient-text">Brief</span> to<br>
+      Complete <span class="gradient-text">Design Files</span>
+    </h1>
+    
+    <p class="text-gray-400 text-lg max-w-2xl mx-auto mb-10">
+      Upload your design brief and get ready-to-use design files including logos, UI kits, 
+      color palettes, typography systems, and style guides.
+    </p>
+    
+    <!-- Quick Stats -->
+    <div class="flex flex-wrap justify-center gap-6 mb-12">
+      <div class="text-center">
+        <div class="text-2xl font-bold gradient-text">15+</div>
+        <div class="text-gray-400 text-sm">File Formats</div>
+      </div>
+      <div class="text-center">
+        <div class="text-2xl font-bold gradient-text">100%</div>
+        <div class="text-gray-400 text-sm">Editable Files</div>
+      </div>
+      <div class="text-center">
+        <div class="text-2xl font-bold gradient-text">5 min</div>
+        <div class="text-gray-400 text-sm">Average Generation</div>
+      </div>
+      <div class="text-center">
+        <div class="text-2xl font-bold gradient-text">AI</div>
+        <div class="text-gray-400 text-sm">Powered</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Main Brief Input Section -->
+  <section id="brief" class="max-w-6xl mx-auto mb-20">
+    <div class="glass-effect rounded-2xl p-8 card-hover">
+      <!-- Step Indicator -->
+      <div class="flex justify-between items-center mb-8">
+        <div class="flex items-center space-x-4">
+          <div class="step-indicator active">1</div>
+          <div>
+            <h2 class="text-2xl font-bold">Upload Your Design Brief</h2>
+            <p class="text-gray-400">Describe or upload your design requirements</p>
+          </div>
+        </div>
+        <div class="text-sm text-gray-400">
+          Step 1 of 3
+        </div>
+      </div>
+
+      <!-- Brief Input Options -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-8">
+        <!-- Text Brief -->
+        <div class="bg-gray-900/50 rounded-xl p-6">
+          <h3 class="text-xl font-bold mb-4 flex items-center">
+            <i class="fas fa-keyboard text-indigo-400 mr-3"></i>
+            Text Description
+          </h3>
+          <p class="text-gray-400 mb-4">Describe your design needs in detail</p>
+          
+          <textarea
+            id="textBrief"
+            placeholder="Describe your design project...
+Example:
+'I need a modern tech startup logo with geometric shapes, using blue and purple colors. The company name is "NexusTech". Also need a complete UI kit for a SaaS dashboard with dark mode, including buttons, cards, forms, and navigation components. Create a brand style guide with color palette and typography system.'
+            
+Guidelines:
+• Be specific about colors, styles, and requirements
+• Mention file formats needed (SVG, PNG, AI, Figma, etc.)
+• Include any brand guidelines or references"
+            class="w-full h-64 p-4 rounded-lg bg-black/40 border border-white/10 focus:outline-none focus:ring-2 focus:ring-indigo-500 resize-none mb-4"
+          ></textarea>
+          
+          <div class="text-right text-sm text-gray-500">
+            <span id="charCount">0</span>/2000 characters
+          </div>
+          
+          <div class="mt-4">
+            <button onclick="analyzeTextBrief()" class="w-full bg-indigo-600 hover:bg-indigo-700 py-3 rounded-lg font-medium">
+              <i class="fas fa-robot mr-2"></i>
+              Analyze Brief with AI
+            </button>
+          </div>
+        </div>
+
+        <!-- File Upload -->
+        <div class="bg-gray-900/50 rounded-xl p-6">
+          <h3 class="text-xl font-bold mb-4 flex items-center">
+            <i class="fas fa-file-upload text-emerald-400 mr-3"></i>
+            Upload Files
+          </h3>
+          <p class="text-gray-400 mb-4">Upload existing design files, images, or documents</p>
+          
+          <div 
+            id="uploadArea" 
+            class="upload-area p-8 text-center cursor-pointer"
+            onclick="document.getElementById('fileInput').click()"
+          >
+            <div class="w-20 h-20 mx-auto mb-4 rounded-full bg-gradient-to-r from-indigo-900/30 to-purple-900/30 flex items-center justify-center">
+              <i class="fas fa-cloud-upload-alt text-3xl text-indigo-500"></i>
+            </div>
+            <h4 class="text-lg font-medium mb-2">Drop files here or click to upload</h4>
+            <p class="text-gray-500 text-sm mb-4">Supports: PDF, DOC, JPG, PNG, AI, PSD, Figma</p>
+            <div class="text-xs text-gray-500">
+              <i class="fas fa-lock mr-1"></i>
+              Files are secure and private
+            </div>
+          </div>
+          
+          <input type="file" id="fileInput" class="hidden" multiple onchange="handleFileUpload(event)">
+          
+          <!-- Uploaded Files List -->
+          <div id="uploadedFiles" class="mt-4 space-y-2 hidden">
+            <h4 class="font-medium mb-2">Uploaded Files:</h4>
+            <div class="space-y-2">
+              <!-- Files will be listed here -->
+            </div>
+          </div>
+          
+          <div class="mt-6">
+            <button onclick="processUploadedFiles()" class="w-full bg-emerald-600 hover:bg-emerald-700 py-3 rounded-lg font-medium">
+              <i class="fas fa-cogs mr-2"></i>
+              Process Files
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Templates -->
+      <div>
+        <h3 class="text-lg font-bold mb-4">Quick Templates</h3>
+        <div class="flex flex-wrap gap-3">
+          <button onclick="loadTemplate('tech')" class="bg-white/5 hover:bg-white/10 px-4 py-2 rounded-lg transition-colors text-sm">
+            <i class="fas fa-laptop-code mr-2"></i>
+            Tech Startup
+          </button>
+          <button onclick="loadTemplate('ecommerce')" class="bg-white/5 hover:bg-white/10 px-4 py-2 rounded-lg transition-colors text-sm">
+            <i class="fas fa-shopping-cart mr-2"></i>
+            E-commerce
+          </button>
+          <button onclick="loadTemplate('app')" class="bg-white/5 hover:bg-white/10 px-4 py-2 rounded-lg transition-colors text-sm">
+            <i class="fas fa-mobile-alt mr-2"></i>
+            Mobile App
+          </button>
+          <button onclick="loadTemplate('brand')" class="bg-white/5 hover:bg-white/10 px-4 py-2 rounded-lg transition-colors text-sm">
+            <i class="fas fa-palette mr-2"></i>
+            Brand Identity
+          </button>
+          <button onclick="loadTemplate('dashboard')" class="bg-white/5 hover:bg-white/10 px-4 py-2 rounded-lg transition-colors text-sm">
+            <i class="fas fa-chart-line mr-2"></i>
+            Dashboard UI
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- AI Analysis Progress -->
+    <div id="analysisProgress" class="hidden glass-effect rounded-2xl p-8 mt-8 card-hover">
+      <div class="flex items-center justify-between mb-6">
+        <div class="flex items-center">
+          <div class="ai-thinking mr-4"></div>
+          <div>
+            <h3 class="text-xl font-bold">AI is Analyzing Your Brief</h3>
+            <p class="text-gray-400 text-sm">Extracting requirements and planning design files</p>
+          </div>
+        </div>
+        <div class="text-sm font-medium" id="progressPercent">0%</div>
+      </div>
+      
+      <div class="mb-4">
+        <div class="progress-bar">
+          <div id="progressFill" class="progress-fill" style="width: 0%"></div>
+        </div>
+      </div>
+      
+      <div id="analysisSteps" class="space-y-3">
+        <!-- Steps will be populated by JavaScript -->
+      </div>
+    </div>
+  </section>
+
+  <!-- Generated Design Files Preview -->
+  <section id="files" class="max-w-6xl mx-auto mb-20">
+    <div class="glass-effect rounded-2xl p-8 card-hover">
+      <!-- Step Indicator -->
+      <div class="flex justify-between items-center mb-8">
+        <div class="flex items-center space-x-4">
+          <div class="step-indicator" id="step2Indicator">2</div>
+          <div>
+            <h2 class="text-2xl font-bold">Generated Design Files</h2>
+            <p class="text-gray-400">Preview and customize your design files</p>
+          </div>
+        </div>
+        <div class="text-sm text-gray-400">
+          Step 2 of 3
+        </div>
+      </div>
+
+      <!-- File Categories -->
+      <div id="fileCategories" class="space-y-6">
+        <!-- Categories will be populated by JavaScript -->
+      </div>
+
+      <!-- Design System Preview -->
+      <div id="designSystem" class="mt-12 hidden">
+        <h3 class="text-2xl font-bold mb-6">Design System Preview</h3>
+        
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <!-- Color Palette -->
+          <div class="bg-gray-900/50 rounded-xl p-6">
+            <h4 class="text-lg font-bold mb-4 flex items-center">
+              <i class="fas fa-fill-drip text-indigo-400 mr-3"></i>
+              Color Palette
+            </h4>
+            <div id="colorPalette" class="mb-4">
+              <!-- Colors will be populated by JavaScript -->
+            </div>
+            <div class="text-sm text-gray-400">
+              <i class="fas fa-info-circle mr-2"></i>
+              Click to copy HEX codes
+            </div>
+          </div>
+          
+          <!-- Typography -->
+          <div class="bg-gray-900/50 rounded-xl p-6">
+            <h4 class="text-lg font-bold mb-4 flex items-center">
+              <i class="fas fa-font text-emerald-400 mr-3"></i>
+              Typography System
+            </h4>
+            <div id="typographySystem">
+              <!-- Typography will be populated by JavaScript -->
+            </div>
+          </div>
+          
+          <!-- UI Components -->
+          <div class="bg-gray-900/50 rounded-xl p-6">
+            <h4 class="text-lg font-bold mb-4 flex items-center">
+              <i class="fas fa-th-large text-amber-400 mr-3"></i>
+              UI Components
+            </h4>
+            <div id="uiComponents" class="space-y-3">
+              <!-- Components will be populated by JavaScript -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Final Preview Section -->
+  <section id="preview" class="max-w-6xl mx-auto mb-20">
+    <div class="glass-effect rounded-2xl p-8 card-hover">
+      <!-- Step Indicator -->
+      <div class="flex justify-between items-center mb-8">
+        <div class="flex items-center space-x-4">
+          <div class="step-indicator" id="step3Indicator">3</div>
+          <div>
+            <h2 class="text-2xl font-bold">Final Preview</h2>
+            <p class="text-gray-400">Review your complete design package</p>
+          </div>
+        </div>
+        <div class="text-sm text-gray-400">
+          Step 3 of 3
+        </div>
+      </div>
+
+      <!-- Live Preview -->
+      <div class="mb-8">
+        <h3 class="text-xl font-bold mb-4">Live Design Preview</h3>
+        <div class="bg-gray-900 rounded-xl p-6">
+          <div class="flex justify-between items-center mb-6">
+            <div class="flex items-center space-x-4">
+              <div class="w-10 h-10 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center">
+                <i class="fas fa-eye"></i>
+              </div>
+              <div>
+                <h4 class="font-bold">Interactive Preview</h4>
+                <p class="text-gray-400 text-sm">Click on elements to customize</p>
+              </div>
+            </div>
+            <div class="flex space-x-3">
+              <button class="px-4 py-2 bg-white/10 hover:bg-white/20 rounded-lg text-sm">
+                <i class="fas fa-desktop mr-2"></i>Desktop
+              </button>
+              <button class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 rounded-lg text-sm">
+                <i class="fas fa-mobile-alt mr-2"></i>Mobile
+              </button>
+            </div>
+          </div>
+          
+          <!-- Preview Canvas -->
+          <div id="previewCanvas" class="bg-gray-800 rounded-lg p-8 min-h-[400px] flex items-center justify-center">
+            <div class="text-center">
+              <div class="w-24 h-24 mx-auto mb-6 rounded-full bg-gradient-to-r from-indigo-900/30 to-purple-900/30 flex items-center justify-center">
+                <i class="fas fa-paint-brush text-4xl text-indigo-500"></i>
+              </div>
+              <p class="text-gray-400 mb-2">Generate design files to see preview</p>
+              <p class="text-gray-500 text-sm">Your complete design system will appear here</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Customization Options -->
+      <div class="mb-8">
+        <h3 class="text-xl font-bold mb-4">Customize Design</h3>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label class="block text-sm font-medium mb-2">Primary Color</label>
+            <input type="color" id="primaryColor" value="#6366f1" class="w-full h-10 rounded-lg cursor-pointer">
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-2">Font Family</label>
+            <select id="fontFamily" class="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-2">
+              <option>Inter</option>
+              <option>Poppins</option>
+              <option>Montserrat</option>
+              <option>Roboto</option>
+              <option>Open Sans</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-2">Design Style</label>
+            <select id="designStyle" class="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-2">
+              <option>Modern</option>
+              <option>Minimal</option>
+              <option>Corporate</option>
+              <option>Creative</option>
+              <option>Playful</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Generate Button -->
+      <div class="text-center">
+        <button onclick="generateDesignFiles()" id="generateBtn" class="gradient-bg hover:opacity-90 px-12 py-4 rounded-xl font-bold text-lg transition-all">
+          <i class="fas fa-bolt mr-3"></i>
+          Generate Complete Design Files
+        </button>
+        <p class="text-gray-500 text-sm mt-3">
+          <i class="fas fa-clock mr-2"></i>
+          Estimated time: 2-3 minutes
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Download Section -->
+  <section id="download" class="max-w-6xl mx-auto mb-20">
+    <div class="glass-effect rounded-2xl p-8 card-hover">
+      <div class="flex items-center justify-between mb-8">
+        <div>
+          <h2 class="text-3xl font-bold mb-2">Download Design Files</h2>
+          <p class="text-gray-400">Get your complete design package in multiple formats</p>
+        </div>
+        <div class="px-4 py-2 bg-gradient-to-r from-emerald-600 to-green-600 rounded-lg">
+          <span class="font-bold">READY</span>
+        </div>
+      </div>
+
+      <!-- Download Options -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+        <div class="bg-gray-900/50 rounded-xl p-6 text-center">
+          <div class="w-16 h-16 mx-auto mb-4 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center">
+            <i class="fas fa-file-archive text-2xl"></i>
+          </div>
+          <h3 class="text-xl font-bold mb-3">Complete Package</h3>
+          <p class="text-gray-400 text-sm mb-4">All design files in a single ZIP</p>
+          <button onclick="downloadPackage('complete')" class="w-full bg-indigo-600 hover:bg-indigo-700 py-3 rounded-lg font-medium">
+            <i class="fas fa-download mr-2"></i>
+            Download ZIP (45 MB)
+          </button>
+        </div>
+        
+        <div class="bg-gray-900/50 rounded-xl p-6 text-center">
+          <div class="w-16 h-16 mx-auto mb-4 rounded-lg bg-gradient-to-r from-cyan-500 to-blue-500 flex items-center justify-center">
+            <i class="fab fa-figma text-2xl"></i>
+          </div>
+          <h3 class="text-xl font-bold mb-3">Figma Files</h3>
+          <p class="text-gray-400 text-sm mb-4">Complete Figma design system</p>
+          <button onclick="downloadPackage('figma')" class="w-full bg-blue-600 hover:bg-blue-700 py-3 rounded-lg font-medium">
+            <i class="fas fa-download mr-2"></i>
+            Download .fig
+          </button>
+        </div>
+        
+        <div class="bg-gray-900/50 rounded-xl p-6 text-center">
+          <div class="w-16 h-16 mx-auto mb-4 rounded-lg bg-gradient-to-r from-emerald-500 to-green-500 flex items-center justify-center">
+            <i class="fas fa-layer-group text-2xl"></i>
+          </div>
+          <h3 class="text-xl font-bold mb-3">Individual Files</h3>
+          <p class="text-gray-400 text-sm mb-4">Download specific file types</p>
+          <button onclick="showIndividualFiles()" class="w-full bg-emerald-600 hover:bg-emerald-700 py-3 rounded-lg font-medium">
+            <i class="fas fa-file-export mr-2"></i>
+            Browse Files
+          </button>
+        </div>
+      </div>
+
+      <!-- File List -->
+      <div id="fileList" class="hidden bg-gray-900/30 rounded-xl p-6">
+        <h3 class="text-xl font-bold mb-4">Available Files</h3>
+        <div class="space-y-3" id="filesListContent">
+          <!-- Files will be listed here -->
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="max-w-6xl mx-auto">
+    <h2 class="text-3xl font-bold text-center mb-12">Professional Design Output</h2>
+    
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <div class="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-6 border border-white/10">
+        <div class="w-14 h-14 rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 flex items-center justify-center mb-6">
+          <i class="fas fa-file-export text-xl"></i>
+        </div>
+        <h3 class="text-xl font-bold mb-4">15+ File Formats</h3>
+        <p class="text-gray-400">Get designs in SVG, PNG, PDF, AI, PSD, Figma, Sketch, XD, and more</p>
+      </div>
+      
+      <div class="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-6 border border-white/10">
+        <div class="w-14 h-14 rounded-lg bg-gradient-to-r from-cyan-600 to-blue-600 flex items-center justify-center mb-6">
+          <i class="fas fa-layer-group text-xl"></i>
+        </div>
+        <h3 class="text-xl font-bold mb-4">Complete Design Systems</h3>
+        <p class="text-gray-400">Full design systems with components, styles, and documentation</p>
+      </div>
+      
+      <div class="bg-gradient-to-br from-gray-900 to-gray-800 rounded-2xl p-6 border border-white/10">
+        <div class="w-14 h-14 rounded-lg bg-gradient-to-r from-emerald-600 to-green-600 flex items-center justify-center mb-6">
+          <i class="fas fa-edit text-xl"></i>
+        </div>
+        <h3 class="text-xl font-bold mb-4">Fully Editable</h3>
+        <p class="text-gray-400">All files are 100% editable with layers, vectors, and organized groups</p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<!-- Footer -->
+<footer class="border-t border-white/10 mt-16 py-8 px-4">
+  <div class="max-w-6xl mx-auto">
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+      <div>
+        <div class="flex items-center space-x-2 mb-4">
+          <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center">
+            <i class="fas fa-pencil-ruler text-sm"></i>
+          </div>
+          <h1 class="text-xl font-bold">Design<span class="gradient-text">Brief</span></h1>
+        </div>
+        <p class="text-gray-400 text-sm">Transform briefs into complete design files with AI.</p>
+      </div>
+      
+      <div>
+        <h3 class="font-bold mb-4">Output Formats</h3>
+        <ul class="space-y-2 text-gray-400 text-sm">
+          <li>• SVG Vector Files</li>
+          <li>• Figma Design Systems</li>
+          <li>• Adobe Illustrator (.ai)</li>
+          <li>• Photoshop (.psd)</li>
+          <li>• PDF Style Guides</li>
+        </ul>
+      </div>
+      
+      <div>
+        <h3 class="font-bold mb-4">Design Elements</h3>
+        <ul class="space-y-2 text-gray-400 text-sm">
+          <li>• Logos & Branding</li>
+          <li>• UI Components</li>
+          <li>• Color Palettes</li>
+          <li>• Typography Systems</li>
+          <li>• Icon Sets</li>
+        </ul>
+      </div>
+      
+      <div>
+        <h3 class="font-bold mb-4">Connect</h3>
+        <div class="flex space-x-4">
+          <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-indigo-600 transition-colors">
+            <i class="fab fa-figma"></i>
+          </a>
+          <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-indigo-600 transition-colors">
+            <i class="fab fa-sketch"></i>
+          </a>
+          <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-indigo-600 transition-colors">
+            <i class="fab fa-adobe"></i>
+          </a>
+          <a href="#" class="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center hover:bg-indigo-600 transition-colors">
+            <i class="fab fa-github"></i>
+          </a>
+        </div>
+      </div>
+    </div>
+    
+    <div class="border-t border-white/10 mt-8 pt-8 text-center text-gray-400 text-sm">
+      <p>&copy; 2026 DesignBrief Pro. All design files include commercial license.</p>
+    </div>
+  </div>
+</footer>
+
+<!-- Individual Files Modal -->
+<div id="filesModal" class="fixed inset-0 bg-black/80 flex items-center justify-center z-50 hidden">
+  <div class="bg-gray-900 rounded-2xl p-8 max-w-4xl w-full mx-4 max-h-[80vh] overflow-y-auto">
+    <div class="flex items-center justify-between mb-6">
+      <h3 class="text-xl font-bold">Download Individual Files</h3>
+      <button onclick="closeFilesModal()" class="text-gray-400 hover:text-white">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <div class="space-y-4" id="individualFilesList">
+      <!-- Files will be listed here -->
+    </div>
+  </div>
+</div>
+
+<!-- Toast Notification -->
+<div id="toast" class="fixed bottom-4 right-4 bg-gray-800 text-white px-6 py-3 rounded-lg shadow-xl border border-white/10 transform translate-y-10 opacity-0 transition-all duration-300 z-50">
+  <div class="flex items-center">
+    <i class="fas fa-check-circle text-green-400 mr-3"></i>
+    <span id="toastMessage">Design files generated successfully!</span>
+  </div>
+</div>
+
+<script>
+  // Design Files Generator
+  
+  // Store generated design data
+  window.designData = {
+    brief: '',
+    files: [],
+    colors: [],
+    typography: [],
+    components: [],
+    logo: null
+  };
+  
+  // Initialize character counter
+  document.getElementById('textBrief').addEventListener('input', function() {
+    const charCount = this.value.length;
+    document.getElementById('charCount').textContent = charCount;
+  });
+  
+  // Handle file upload
+  function handleFileUpload(event) {
+    const files = event.target.files;
+    const uploadArea = document.getElementById('uploadArea');
+    const uploadedFilesDiv = document.getElementById('uploadedFiles');
+    const filesList = uploadedFilesDiv.querySelector('.space-y-2') || uploadedFilesDiv;
+    
+    if (files.length > 0) {
+      uploadedFilesDiv.classList.remove('hidden');
+      filesList.innerHTML = '';
+      
+      Array.from(files).forEach((file, index) => {
+        const fileElement = document.createElement('div');
+        fileElement.className = 'flex items-center p-3 bg-white/5 rounded-lg';
+        fileElement.innerHTML = `
+          <div class="file-icon bg-indigo-900/30">
+            <i class="fas fa-file text-indigo-400"></i>
+          </div>
+          <div class="flex-1">
+            <div class="font-medium">${file.name}</div>
+            <div class="text-gray-500 text-xs">${(file.size / 1024).toFixed(1)} KB</div>
+          </div>
+          <button onclick="removeFile(${index})" class="text-gray-400 hover:text-white">
+            <i class="fas fa-times"></i>
+          </button>
+        `;
+        filesList.appendChild(fileElement);
+        
+        // Store file
+        window.designData.files.push(file);
+      });
+    }
+  }
+  
+  // Remove file from upload
+  function removeFile(index) {
+    window.designData.files.splice(index, 1);
+    handleFileUpload({ target: { files: window.designData.files } });
+  }
+  
+  // File upload drag and drop
+  const uploadArea = document.getElementById('uploadArea');
+  ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+    uploadArea.addEventListener(eventName, preventDefaults, false);
+  });
+  
+  function preventDefaults(e) {
+    e.preventDefault();
+    e.stopPropagation();
+  }
+  
+  ['dragenter', 'dragover'].forEach(eventName => {
+    uploadArea.addEventListener(eventName, highlight, false);
+  });
+  
+  ['dragleave', 'drop'].forEach(eventName => {
+    uploadArea.addEventListener(eventName, unhighlight, false);
+  });
+  
+  function highlight() {
+    uploadArea.classList.add('dragover');
+  }
+  
+  function unhighlight() {
+    uploadArea.classList.remove('dragover');
+  }
+  
+  uploadArea.addEventListener('drop', handleDrop, false);
+  
+  function handleDrop(e) {
+    const dt = e.dataTransfer;
+    const files = dt.files;
+    const input = document.getElementById('fileInput');
+    input.files = files;
+    handleFileUpload({ target: { files: files } });
+  }
+  
+  // Process uploaded files
+  function processUploadedFiles() {
+    if (window.designData.files.length === 0) {
+      showToast('Please upload files first', 'error');
+      return;
+    }
+    
+    showToast('Processing uploaded files with AI...', 'info');
+    // In real implementation, this would send files to AI for analysis
+  }
+  
+  // Load template briefs
+  function loadTemplate(template) {
+    const templates = {
+      tech: `I need a modern tech startup branding package for a company called "QuantumLabs" that works with AI and quantum computing.
+
+Logo Requirements:
+- Minimalist and futuristic design
+- Incorporate circuit patterns or quantum symbols
+- Primary colors: Blue (#3B82F6) and Purple (#8B5CF6)
+- Should work in dark and light backgrounds
+
+Design System:
+- Complete UI kit for a SaaS dashboard
+- Dark mode design system
+- Include buttons, cards, tables, forms, charts
+- Component states (hover, active, disabled)
+
+File Formats Needed:
+- SVG logo files (all variations)
+- Figma design system
+- Adobe Illustrator files
+- Style guide PDF
+- PNG assets for web
+
+Brand Guidelines:
+- Modern, clean, professional
+- Tech-oriented but approachable
+- Consistent spacing system (8px grid)`,
+      
+      ecommerce: `Create a complete e-commerce brand identity for "EcoStyle" - a sustainable fashion brand.
+
+Brand Identity:
+- Logo with leaf/nature elements
+- Earthy color palette (greens, browns, natural colors)
+- Organic, flowing shapes
+- Should convey sustainability and style
+
+Website Design:
+- Complete e-commerce UI kit
+- Product pages, cart, checkout flows
+- Mobile-responsive design
+- Marketing banners and promotions
+
+Required Files:
+- Logo in multiple formats (SVG, PNG, AI)
+- Product mockup templates
+- Social media kit (banners, posts)
+- Email template designs
+- Packaging design concepts`,
+      
+      app: `Design a mobile app interface for "FitTrack" - a fitness tracking application.
+
+App Requirements:
+- Clean, energetic design
+- Motivational and encouraging feel
+- Color scheme: Energetic colors (oranges, blues)
+- Should work on iOS and Android
+
+Screens Needed:
+- Onboarding flow
+- Dashboard with stats
+- Workout tracking
+- Progress charts
+- Social features
+- Profile settings
+
+Design Files:
+- Figma design system with components
+- iOS and Android specific assets
+- App icon in multiple sizes
+- Loading animations
+- Illustration style guide`,
+      
+      brand: `Complete brand identity package for "ArtisanBrew" - a craft coffee shop.
+
+Brand Elements:
+- Vintage/modern hybrid style
+- Coffee-related imagery
+- Warm, inviting color palette
+- Should feel artisanal and premium
+
+Deliverables:
+- Primary and secondary logos
+- Color palette with exact HEX codes
+- Typography system (2-3 font families)
+- Business cards design
+- Menu and signage templates
+- Packaging designs
+- Social media templates
+
+Style Guide:
+- Logo usage guidelines
+- Color applications
+- Typography hierarchy
+- Photography style
+- Iconography set`
+    };
+    
+    document.getElementById('textBrief').value = templates[template];
+    document.getElementById('charCount').textContent = templates[template].length;
+    showToast(`${template} template loaded`, 'success');
+  }
+  
+  // Analyze text brief
+  function analyzeTextBrief() {
+    const brief = document.getElementById('textBrief').value.trim();
+    if (!brief) {
+      showToast('Please enter a design brief first', 'error');
+      return;
+    }
+    
+    window.designData.brief = brief;
+    
+    // Show analysis progress
+    const analysisDiv = document.getElementById('analysisProgress');
+    analysisDiv.classList.remove('hidden');
+    analysisDiv.classList.add('fade-in');
+    
+    // Start progress animation
+    let progress = 0;
+    const progressFill = document.getElementById('progressFill');
+    const progressPercent = document.getElementById('progressPercent');
+    const analysisSteps = document.getElementById('analysisSteps');
+    
+    // Clear previous steps
+    analysisSteps.innerHTML = '';
+    
+    const steps = [
+      'Reading design brief...',
+      'Extracting requirements...',
+      'Analyzing color preferences...',
+      'Identifying design styles...',
+      'Planning file structure...',
+      'Preparing AI models...'
+    ];
+    
+    let currentStep = 0;
+    
+    const progressInterval = setInterval(() => {
+      progress += 1;
+      progressFill.style.width = `${progress}%`;
+      progressPercent.textContent = `${progress}%`;
+      
+      // Add new step every 15%
+      if (progress % 15 === 0 && currentStep < steps.length) {
+        const stepDiv = document.createElement('div');
+        stepDiv.className = 'flex items-center text-sm';
+        stepDiv.innerHTML = `
+          <i class="fas fa-check-circle text-emerald-500 mr-3"></i>
+          <span>${steps[currentStep]}</span>
+        `;
+        analysisSteps.appendChild(stepDiv);
+        currentStep++;
+      }
+      
+      if (progress >= 100) {
+        clearInterval(progressInterval);
+        
+        // Show success message
+        const successDiv = document.createElement('div');
+        successDiv.className = 'mt-4 p-4 bg-emerald-900/20 border border-emerald-700/30 rounded-lg';
+        successDiv.innerHTML = `
+          <div class="flex items-center">
+            <i class="fas fa-check-circle text-emerald-400 text-xl mr-3"></i>
+            <div>
+              <div class="font-bold">Brief Analysis Complete!</div>
+              <div class="text-sm text-gray-300">AI has identified ${Math.floor(Math.random() * 15) + 10} design requirements</div>
+            </div>
+          </div>
+        `;
+        analysisSteps.appendChild(successDiv);
+        
+        // Update step indicators
+        document.getElementById('step2Indicator').classList.add('active');
+        document.getElementById('step3Indicator').classList.add('active');
+        
+        // Show file categories
+        showFileCategories();
+        
+        showToast('Brief analyzed successfully!', 'success');
+      }
+    }, 50);
+  }
+  
+  // Show file categories based on brief
+  function showFileCategories() {
+    const fileCategoriesDiv = document.getElementById('fileCategories');
+    const designSystemDiv = document.getElementById('designSystem');
+    
+    // Define categories based on brief analysis
+    const categories = [
+      {
+        title: 'Logo & Branding',
+        icon: 'fa-crown',
+        color: 'from-amber-500 to-orange-500',
+        files: [
+          { name: 'Primary Logo', format: 'SVG', size: '45 KB' },
+          { name: 'Secondary Logo', format: 'SVG', size: '42 KB' },
+          { name: 'Favicon Set', format: 'PNG', size: '15 KB' },
+          { name: 'Logo Variations', format: 'AI', size: '120 KB' },
+          { name: 'Brand Guidelines', format: 'PDF', size: '850 KB' }
+        ]
+      },
+      {
+        title: 'UI Components',
+        icon: 'fa-th-large',
+        color: 'from-indigo-500 to-purple-500',
+        files: [
+          { name: 'Button System', format: 'Figma', size: '240 KB' },
+          { name: 'Form Elements', format: 'Figma', size: '180 KB' },
+          { name: 'Navigation Components', format: 'SVG', size: '95 KB' },
+          { name: 'Card Templates', format: 'AI', size: '210 KB' },
+          { name: 'Modal Windows', format: 'Figma', size: '160 KB' }
+        ]
+      },
+      {
+        title: 'Design System',
+        icon: 'fa-palette',
+        color: 'from-emerald-500 to-green-500',
+        files: [
+          { name: 'Color Palette', format: 'JSON', size: '12 KB' },
+          { name: 'Typography System', format: 'JSON', size: '18 KB' },
+          { name: 'Icon Set', format: 'SVG', size: '320 KB' },
+          { name: 'Spacing Guide', format: 'PDF', size: '45 KB' },
+          { name: 'Design Tokens', format: 'JSON', size: '25 KB' }
+        ]
+      },
+      {
+        title: 'Marketing Assets',
+        icon: 'fa-bullhorn',
+        color: 'from-pink-500 to-rose-500',
+        files: [
+          { name: 'Social Media Kit', format: 'PSD', size: '1.2 MB' },
+          { name: 'Email Templates', format: 'HTML', size: '890 KB' },
+          { name: 'Presentation Slides', format: 'PPTX', size: '2.1 MB' },
+          { name: 'Business Cards', format: 'AI', size: '350 KB' },
+          { name: 'Marketing Banners', format: 'PNG', size: '680 KB' }
+        ]
+      }
+    ];
+    
+    // Render categories
+    fileCategoriesDiv.innerHTML = '';
+    
+    categories.forEach(category => {
+      const categoryDiv = document.createElement('div');
+      categoryDiv.className = 'bg-gray-900/50 rounded-xl p-6';
+      categoryDiv.innerHTML = `
+        <div class="flex items-center mb-4">
+          <div class="w-12 h-12 rounded-lg bg-gradient-to-r ${category.color} flex items-center justify-center mr-4">
+            <i class="fas ${category.icon} text-white"></i>
+          </div>
+          <div>
+            <h3 class="text-xl font-bold">${category.title}</h3>
+            <p class="text-gray-400 text-sm">${category.files.length} files</p>
+          </div>
+        </div>
+        <div class="space-y-2">
+          ${category.files.map(file => `
+            <div class="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+              <div class="flex items-center">
+                <i class="fas fa-file text-gray-400 mr-3"></i>
+                <div>
+                  <div class="font-medium">${file.name}</div>
+                  <div class="text-gray-500 text-xs">${file.format} • ${file.size}</div>
+                </div>
+              </div>
+              <button class="text-gray-400 hover:text-white">
+                <i class="fas fa-eye"></i>
+              </button>
+            </div>
+          `).join('')}
+        </div>
+      `;
+      fileCategoriesDiv.appendChild(categoryDiv);
+    });
+    
+    // Show design system
+    designSystemDiv.classList.remove('hidden');
+    designSystemDiv.classList.add('fade-in');
+    
+    // Populate color palette
+    const colorPaletteDiv = document.getElementById('colorPalette');
+    const colors = ['#6366F1', '#8B5CF6', '#10B981', '#F59E0B', '#EF4444', '#3B82F6'];
+    colorPaletteDiv.innerHTML = colors.map(color => `
+      <div class="color-swatch inline-block" style="background: ${color};" onclick="copyToClipboard('${color}')" title="${color}"></div>
+    `).join('');
+    
+    // Populate typography system
+    const typographyDiv = document.getElementById('typographySystem');
+    typographyDiv.innerHTML = `
+      <div class="typography-sample">
+        <div class="text-2xl font-bold mb-1">Heading 1 - Inter Bold</div>
+        <div class="text-gray-400 text-sm">48px • Line height: 56px</div>
+      </div>
+      <div class="typography-sample">
+        <div class="text-xl font-semibold mb-1">Heading 2 - Inter Semibold</div>
+        <div class="text-gray-400 text-sm">32px • Line height: 40px</div>
+      </div>
+      <div class="typography-sample">
+        <div class="text-lg font-medium mb-1">Body Text - Inter Regular</div>
+        <div class="text-gray-400 text-sm">16px • Line height: 24px</div>
+      </div>
+    `;
+    
+    // Populate UI components
+    const componentsDiv = document.getElementById('uiComponents');
+    componentsDiv.innerHTML = `
+      <div class="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+        <div class="flex items-center">
+          <div class="w-8 h-8 rounded bg-indigo-600 mr-3"></div>
+          <div>Primary Buttons</div>
+        </div>
+        <div class="text-gray-500 text-sm">4 variants</div>
+      </div>
+      <div class="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+        <div class="flex items-center">
+          <div class="w-8 h-8 rounded bg-gray-700 mr-3"></div>
+          <div>Form Inputs</div>
+        </div>
+        <div class="text-gray-500 text-sm">8 variants</div>
+      </div>
+      <div class="flex items-center justify-between p-3 bg-white/5 rounded-lg">
+        <div class="flex items-center">
+          <div class="w-8 h-8 rounded bg-emerald-600 mr-3"></div>
+          <div>Cards</div>
+        </div>
+        <div class="text-gray-500 text-sm">6 variants</div>
+      </div>
+    `;
+  }
+  
+  // Generate design files
+  function generateDesignFiles() {
+    const brief = window.designData.brief;
+    if (!brief) {
+      showToast('Please analyze your brief first', 'error');
+      return;
+    }
+    
+    const generateBtn = document.getElementById('generateBtn');
+    generateBtn.innerHTML = '<i class="fas fa-spinner fa-spin mr-3"></i> Generating Design Files...';
+    generateBtn.disabled = true;
+    
+    // Show generation animation in preview
+    const previewCanvas = document.getElementById('previewCanvas');
+    previewCanvas.innerHTML = `
+      <div class="text-center">
+        <div class="ai-thinking mx-auto mb-6"></div>
+        <h3 class="text-xl font-bold mb-2">AI is Creating Your Design Files</h3>
+        <p class="text-gray-400 mb-4">Generating logos, UI components, and complete design system</p>
+        <div class="inline-flex items-center space-x-2 text-sm text-gray-500">
+          <i class="fas fa-microchip"></i>
+          <span>Using Neural Design Model v3.5</span>
+        </div>
+      </div>
+    `;
+    
+    // Simulate generation process
+    setTimeout(() => {
+      // Show generated design preview
+      previewCanvas.innerHTML = `
+        <div class="w-full max-w-2xl mx-auto">
+          <div class="bg-gray-900 rounded-xl p-6 mb-6">
+            <div class="flex items-center justify-between mb-6">
+              <div class="flex items-center">
+                <div class="w-12 h-12 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center mr-4">
+                  <i class="fas fa-crown text-white"></i>
+                </div>
+                <div>
+                  <div class="font-bold">NexusTech Logo</div>
+                  <div class="text-gray-400 text-sm">Modern Tech Startup</div>
+                </div>
+              </div>
+              <div class="text-sm text-gray-500">SVG • AI • PNG</div>
+            </div>
+            <div class="flex justify-center p-8 bg-gray-800 rounded-lg">
+              <div class="w-40 h-40 rounded-full bg-gradient-to-r from-indigo-500 to-purple-500 flex items-center justify-center">
+                <div class="text-white text-2xl font-bold">NT</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="grid grid-cols-2 gap-4">
+            <div class="bg-gray-900 rounded-lg p-4">
+              <div class="text-sm text-gray-400 mb-2">Primary Button</div>
+              <button class="w-full bg-indigo-600 hover:bg-indigo-700 py-2 rounded-lg">Action</button>
+            </div>
+            <div class="bg-gray-900 rounded-lg p-4">
+              <div class="text-sm text-gray-400 mb-2">Card Component</div>
+              <div class="bg-gray-800 rounded-lg p-3">
+                <div class="font-medium mb-1">Design Complete</div>
+                <div class="text-gray-400 text-sm">All files generated</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      // Enable download section
+      document.getElementById('download').scrollIntoView({ behavior: 'smooth' });
+      
+      // Update button
+      generateBtn.innerHTML = '<i class="fas fa-check mr-3"></i> Design Files Ready!';
+      generateBtn.classList.add('bg-emerald-600');
+      generateBtn.classList.remove('gradient-bg');
+      
+      // Populate file list
+      populateFileList();
+      
+      showToast('Complete design package generated successfully!', 'success');
+    }, 4000);
+  }
+  
+  // Populate file list for download
+  function populateFileList() {
+    const files = [
+      { name: 'Primary Logo', format: 'SVG', size: '45 KB', type: 'logo' },
+      { name: 'Secondary Logo', format: 'SVG', size: '42 KB', type: 'logo' },
+      { name: 'Figma Design System', format: 'Figma', size: '2.1 MB', type: 'ui' },
+      { name: 'Adobe Illustrator Files', format: 'AI', size: '3.4 MB', type: 'vector' },
+      { name: 'Color Palette', format: 'JSON', size: '12 KB', type: 'system' },
+      { name: 'Typography System', format: 'JSON', size: '18 KB', type: 'system' },
+      { name: 'UI Components Library', format: 'Figma', size: '1.8 MB', type: 'ui' },
+      { name: 'Icon Set (100+ icons)', format: 'SVG', size: '320 KB', type: 'assets' },
+      { name: 'Style Guide', format: 'PDF', size: '850 KB', type: 'documentation' },
+      { name: 'Social Media Kit', format: 'PSD', size: '1.2 MB', type: 'marketing' },
+      { name: 'Email Templates', format: 'HTML', size: '890 KB', type: 'marketing' },
+      { name: 'Complete Package', format: 'ZIP', size: '45 MB', type: 'package' }
+    ];
+    
+    const filesListContent = document.getElementById('filesListContent');
+    filesListContent.innerHTML = files.map(file => `
+      <div class="flex items-center justify-between p-4 bg-white/5 rounded-lg">
+        <div class="flex items-center">
+          <div class="file-icon ${getFileTypeColor(file.type)}">
+            <i class="fas ${getFileIcon(file.format)}"></i>
+          </div>
+          <div>
+            <div class="font-medium">${file.name}</div>
+            <div class="text-gray-500 text-xs">${file.format} • ${file.size}</div>
+          </div>
+        </div>
+        <button onclick="downloadFile('${file.name}')" class="bg-indigo-600 hover:bg-indigo-700 px-4 py-2 rounded-lg text-sm">
+          <i class="fas fa-download mr-2"></i>
+          Download
+        </button>
+      </div>
+    `).join('');
+  }
+  
+  // Helper function for file icons
+  function getFileIcon(format) {
+    const icons = {
+      'SVG': 'fa-vector-square',
+      'Figma': 'fa-figma',
+      'AI': 'fa-pen-nib',
+      'JSON': 'fa-code',
+      'PDF': 'fa-file-pdf',
+      'PSD': 'fa-adobe',
+      'HTML': 'fa-code',
+      'ZIP': 'fa-file-archive',
+      'PNG': 'fa-image'
+    };
+    return icons[format] || 'fa-file';
+  }
+  
+  // Helper function for file type colors
+  function getFileTypeColor(type) {
+    const colors = {
+      'logo': 'bg-amber-900/30',
+      'ui': 'bg-indigo-900/30',
+      'vector': 'bg-purple-900/30',
+      'system': 'bg-emerald-900/30',
+      'assets': 'bg-cyan-900/30',
+      'documentation': 'bg-blue-900/30',
+      'marketing': 'bg-pink-900/30',
+      'package': 'bg-gray-900/30'
+    };
+    return colors[type] || 'bg-gray-900/30';
+  }
+  
+  // Download package
+  function downloadPackage(type) {
+    showToast(`Downloading ${type} package...`, 'info');
+    setTimeout(() => {
+      showToast('Download complete! Check your downloads folder.', 'success');
+    }, 2000);
+  }
+  
+  // Show individual files
+  function showIndividualFiles() {
+    document.getElementById('filesModal').classList.remove('hidden');
+  }
+  
+  // Close files modal
+  function closeFilesModal() {
+    document.getElementById('filesModal').classList.add('hidden');
+  }
+  
+  // Download individual file
+  function downloadFile(filename) {
+    showToast(`Downloading ${filename}...`, 'info');
+    setTimeout(() => {
+      showToast(`${filename} downloaded successfully`, 'success');
+    }, 1500);
+  }
+  
+  // Copy to clipboard
+  function copyToClipboard(text) {
+    navigator.clipboard.writeText(text)
+      .then(() => showToast(`Copied: ${text}`, 'success'))
+      .catch(err => showToast('Failed to copy', 'error'));
+  }
+  
+  // Toast notification
+  function showToast(message, type = 'success') {
+    const toast = document.getElementById('toast');
+    const toastMessage = document.getElementById('toastMessage');
+    const icon = toast.querySelector('i');
+    
+    toastMessage.textContent = message;
+    
+    switch(type) {
+      case 'success':
+        icon.className = 'fas fa-check-circle text-green-400 mr-3';
+        break;
+      case 'error':
+        icon.className = 'fas fa-exclamation-circle text-red-400 mr-3';
+        break;
+      case 'info':
+        icon.className = 'fas fa-info-circle text-blue-400 mr-3';
+        break;
+    }
+    
+    toast.style.transform = 'translateY(0)';
+    toast.style.opacity = '1';
+    
+    setTimeout(() => {
+      toast.style.transform = 'translateY(10px)';
+      toast.style.opacity = '0';
+    }, 3000);
+  }
+</script>
+
+</body>
+</html>
